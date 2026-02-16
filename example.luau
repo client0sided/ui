@@ -1,64 +1,64 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/client0sided/ui/refs/heads/main/library"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/client0sided/ui/refs/heads/main/library.luau"))()
 
-
-local UI = Library.new({
-	Title = "hattori ui",
-	Subtitle = "aimbot",
-	Position = UDim2.new(0.05, 0, 0.22, 0)
+local Window = Library.new({
+    Title = "Hattori UI",
+    Subtitle = "v1.0",
+    Position = UDim2.new(0.05, 0, 0.22, 0)
 })
 
-local tabs = {
-	Aimbot = UI:AddTab("Aimbot", "rbxassetid://YOUR_ICON_ID")
-}
-
-tabs.Aimbot:AddToggle({
-	Title = "toggle or checkbox whatever",
-	Description = "desc",
-	Default = false,
-	Callback = function(state)
-		print("Aimbot enabled:", state)
-	end
+local AimbotTab = Window:AddTab({
+    Title = "Aimbot",
+    Icon = "rbxassetid://YOUR_ICON_ID"
 })
 
-tabs.Aimbot:AddSlider({
-	Title = "dih size",
-	Description = "how big",
-	Min = 0,
-	Max = 100,
-	Default = 50,
-	Increment = 1,
-	Suffix = "%",
-	Callback = function(value)
-		print("clicked:", value)
-	end
+AimbotTab:AddToggle({
+    Title = "Enable Aimbot",
+    Description = "Automatically aim at targets",
+    Default = false,
+    Callback = function(enabled)
+        print("Aimbot enabled:", enabled)
+    end
 })
 
-tabs.Aimbot:AddSlider({
-	Title = "hole size",
-	Description = "ifykyk",
-	Min = 50,
-	Max = 500,
-	Default = 150,
-	Increment = 1,
-	Suffix = "px",
-	Callback = function(value)
-		print("FOV size:", value)
-	end
+AimbotTab:AddSlider({
+    Title = "Smoothness",
+    Description = "How smooth the aim movement is",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Increment = 1,
+    Suffix = "%",
+    Callback = function(value)
+        print("Smoothness:", value)
+    end
 })
 
-tabs.Aimbot:AddToggle({
-	Title = "Target",
-	Description = "target",
-	Default = true,
-	Callback = function(state)
-		print("Target:", state)
-	end
+AimbotTab:AddSlider({
+    Title = "FOV Size",
+    Description = "Field of view radius for targeting",
+    Min = 50,
+    Max = 500,
+    Default = 150,
+    Increment = 1,
+    Suffix = "px",
+    Callback = function(value)
+        print("FOV size:", value)
+    end
 })
 
-tabs.Aimbot:AddButton({
-	Title = "obama have dih",
-	Description = "lock onto nearest player",
-	Callback = function()
-		print("[instert n word]")
-	end
+AimbotTab:AddToggle({
+    Title = "Target Teammates",
+    Description = "Include teammates as targets",
+    Default = false,
+    Callback = function(enabled)
+        print("Target teammates:", enabled)
+    end
+})
+
+AimbotTab:AddButton({
+    Title = "Reset Settings",
+    Description = "Reset all aimbot settings to default",
+    Callback = function()
+        print("Settings reset")
+    end
 })
