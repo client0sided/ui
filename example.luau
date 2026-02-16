@@ -7,8 +7,7 @@ local Window = Library.new({
 })
 
 local AimbotTab = Window:AddTab({
-    Title = "Aimbot",
-    Icon = "rbxassetid://YOUR_ICON_ID"
+    Title = "Aimbot"
 })
 
 AimbotTab:AddToggle({
