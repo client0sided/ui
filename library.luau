@@ -290,12 +290,16 @@ function Library:AddTab(options)
 		name = options
 		iconId = ""
 	elseif type(options) == "table" then
-		name = options.Title or "Tab"
-		iconId = options.Icon or ""
+		name = type(options.Title) == "string" and options.Title or "Tab"
+		iconId = type(options.Icon) == "string" and options.Icon or ""
 	else
 		name = "Tab"
 		iconId = ""
 	end
+	
+	-- Ensure name is always a string
+	name = tostring(name)
+	iconId = tostring(iconId)
 	
 	local tab = {}
 	tab.Name = name
