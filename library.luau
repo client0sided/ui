@@ -500,7 +500,23 @@ function Library:AddParagraph(tab, options)
 	end)
 	
 	table.insert(tab.Elements, paragraph)
-	return paragraph
+	
+	-- Return object with methods
+	return {
+		SetVisible = function(_, visible)
+			paragraph.Visible = visible
+		end,
+		SetTitle = function(_, newTitle)
+			titleLabel.Text = newTitle
+		end,
+		SetDescription = function(_, newDesc)
+			descLabel.Text = newDesc
+		end,
+		Destroy = function(_)
+			paragraph:Destroy()
+		end,
+		Frame = paragraph
+	}
 end
 
 function Library:AddTitle(tab, options)
@@ -559,7 +575,20 @@ function Library:AddTitle(tab, options)
 	end)
 	
 	table.insert(tab.Elements, titleFrame)
-	return titleFrame
+	
+	-- Return object with methods
+	return {
+		SetVisible = function(_, visible)
+			titleFrame.Visible = visible
+		end,
+		SetTitle = function(_, newTitle)
+			titleLabel.Text = newTitle
+		end,
+		Destroy = function(_)
+			titleFrame:Destroy()
+		end,
+		Frame = titleFrame
+	}
 end
 
 function Library:AddToggle(tab, options)
@@ -674,7 +703,35 @@ function Library:AddToggle(tab, options)
 	end)
 	
 	table.insert(tab.Elements, toggleFrame)
-	return toggleFrame
+	
+	-- Return object with methods
+	return {
+		SetValue = function(_, value)
+			checkboxState = value
+			TweenService:Create(checkboxBg, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				BackgroundColor3 = checkboxState and Color3.fromRGB(240, 240, 240) or Color3.fromRGB(25, 25, 25)
+			}):Play()
+			if callback then
+				callback(checkboxState)
+			end
+		end,
+		GetValue = function(_)
+			return checkboxState
+		end,
+		SetVisible = function(_, visible)
+			toggleFrame.Visible = visible
+		end,
+		SetTitle = function(_, newTitle)
+			titleLabel.Text = newTitle
+		end,
+		SetDescription = function(_, newDesc)
+			descLabel.Text = newDesc
+		end,
+		Destroy = function(_)
+			toggleFrame:Destroy()
+		end,
+		Frame = toggleFrame
+	}
 end
 
 function Library:AddButton(tab, options)
@@ -769,7 +826,26 @@ function Library:AddButton(tab, options)
 	end)
 	
 	table.insert(tab.Elements, buttonFrame)
-	return buttonFrame
+	
+	-- Return object with methods
+	return {
+		SetVisible = function(_, visible)
+			buttonFrame.Visible = visible
+		end,
+		SetTitle = function(_, newTitle)
+			titleLabel.Text = newTitle
+		end,
+		SetDescription = function(_, newDesc)
+			descLabel.Text = newDesc
+		end,
+		SetCallback = function(_, newCallback)
+			callback = newCallback
+		end,
+		Destroy = function(_)
+			buttonFrame:Destroy()
+		end,
+		Frame = buttonFrame
+	}
 end
 
 function Library:AddSlider(tab, options)
@@ -955,7 +1031,52 @@ function Library:AddSlider(tab, options)
 	end)
 
 	table.insert(tab.Elements, sliderFrame)
-	return sliderFrame
+	
+	-- Return object with methods
+	return {
+		SetValue = function(_, value)
+			value = math.clamp(value, min, max)
+			currentValue = value
+			local pos = (value - min) / (max - min)
+			
+			valueLabel.Text = tostring(value) .. suffix
+			sliderFill.Size = UDim2.new(pos, 0, 1, 0)
+			sliderKnob.Position = UDim2.new(pos, 0, 0.5, 0)
+			
+			if callback then
+				callback(value)
+			end
+		end,
+		GetValue = function(_)
+			return currentValue
+		end,
+		SetVisible = function(_, visible)
+			sliderFrame.Visible = visible
+		end,
+		SetTitle = function(_, newTitle)
+			titleLabel.Text = newTitle
+		end,
+		SetDescription = function(_, newDesc)
+			if hasDescription and sliderFrame:FindFirstChild("TextLabel") then
+				for _, child in ipairs(sliderFrame:GetChildren()) do
+					if child:IsA("TextLabel") and child.TextColor3 == CONFIG.Colors.TextTertiary then
+						child.Text = newDesc
+						break
+					end
+				end
+			end
+		end,
+		SetMin = function(_, newMin)
+			min = newMin
+		end,
+		SetMax = function(_, newMax)
+			max = newMax
+		end,
+		Destroy = function(_)
+			sliderFrame:Destroy()
+		end,
+		Frame = sliderFrame
+	}
 end
 
 function Library:Destroy()
