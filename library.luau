@@ -283,9 +283,19 @@ function Library:ToggleTabs()
 end
 
 function Library:AddTab(options)
-	options = options or {}
-	local name = options.Title or "Tab"
-	local iconId = options.Icon or ""
+	local name, iconId
+	
+	-- Support both old syntax: AddTab("Name", "Icon") and new syntax: AddTab({Title = "Name", Icon = "Icon"})
+	if type(options) == "string" then
+		name = options
+		iconId = ""
+	elseif type(options) == "table" then
+		name = options.Title or "Tab"
+		iconId = options.Icon or ""
+	else
+		name = "Tab"
+		iconId = ""
+	end
 	
 	local tab = {}
 	tab.Name = name
