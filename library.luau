@@ -1,3 +1,14 @@
+--[[
+HattoriUI
+
+Version: 1.0.3
+Author: @noah_ang
+Contributors:
+
+]]--
+
+
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -29,6 +40,7 @@ local CONFIG = {
 		EasingDirection = Enum.EasingDirection.Out,
 	}
 }
+
 local CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 local CHARSET_LEN = #CHARSET
 local NAME_LENGTH = 12
@@ -55,6 +67,7 @@ local _nameConnection = RunService.Heartbeat:Connect(function(dt)
 		end
 	end
 end)
+
 local function stopNameRandomizer()
 	if _nameConnection then
 		_nameConnection:Disconnect()
@@ -62,6 +75,7 @@ local function stopNameRandomizer()
 	end
 	table.clear(_nameTargets)
 end
+
 local function trackNames(...)
 	for _, inst in ipairs({...}) do
 		if inst then
@@ -74,14 +88,14 @@ function Library.new(options)
 	local self = setmetatable({}, Library)
 	options = options or {}
 
-	self.Title    = options.Title    or "ui"
-	self.Subtitle = options.Subtitle or "Game Name"
-	self.Position = options.Position or UDim2.new(0.05, 0, 0.22, 0)
-	self.Scale    = options.Scale    or 1
+	self.Title     = options.Title     or "ui"
+	self.Subtitle  = options.Subtitle  or "Game Name"
+	self.Position  = options.Position  or UDim2.new(0.05, 0, 0.22, 0)
+	self.Scale     = options.Scale     or 1
 	self.ToggleKey = options.ToggleKey or Enum.KeyCode.RightShift
-	self.Tabs = {}
+	self.Tabs      = {}
 	self.CurrentTab = nil
-	self.IsOpen = false
+	self.IsOpen    = false
 
 	pcall(function()
 		self:CreateUI()
@@ -103,7 +117,6 @@ function Library:CreateUI()
 		local success = pcall(function()
 			syn.protect_gui(self.ScreenGui)
 		end)
-
 		if not success then
 			pcall(function()
 				game:GetService("CoreGui"):FindFirstChild("RobloxGui")
@@ -112,16 +125,15 @@ function Library:CreateUI()
 
 		self.ScreenGui.Parent = game:GetService("CoreGui") or Players.LocalPlayer:WaitForChild("PlayerGui")
 		trackNames(self.ScreenGui)
+
 		local scale = math.clamp(self.Scale, 0.1, 4)
+
 		self.CanvasGroup = Instance.new("CanvasGroup")
 		self.CanvasGroup.Name = "UICanvas"
 		self.CanvasGroup.BackgroundTransparency = 1
 		self.CanvasGroup.BorderSizePixel = 0
 		self.CanvasGroup.Position = self.Position
-		self.CanvasGroup.Size = UDim2.new(
-			0, CONFIG.Sizes.MainFrame.X,
-			0, CONFIG.Sizes.MainFrame.Y
-		)
+		self.CanvasGroup.Size = UDim2.new(0, CONFIG.Sizes.MainFrame.X, 0, CONFIG.Sizes.MainFrame.Y)
 		self.CanvasGroup.Parent = self.ScreenGui
 		trackNames(self.CanvasGroup)
 
@@ -134,7 +146,6 @@ function Library:CreateUI()
 		self.MainFrame.Name = game:GetService("HttpService"):GenerateGUID(false)
 		self.MainFrame.BackgroundColor3 = CONFIG.Colors.Background
 		self.MainFrame.BorderSizePixel = 0
-
 		self.MainFrame.Position = UDim2.new(0, 0, 0, 0)
 		self.MainFrame.Size = UDim2.new(0, CONFIG.Sizes.MainFrame.X, 0, CONFIG.Sizes.MainFrame.Y)
 		self.MainFrame.Parent = self.CanvasGroup
@@ -217,16 +228,10 @@ function Library:CreateHeader()
 	local function update(input)
 		local delta = input.Position - dragStart
 		local targetPos = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
+			startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y
 		)
-
-		if currentTween then
-			currentTween:Cancel()
-		end
-
+		if currentTween then currentTween:Cancel() end
 		currentTween = TweenService:Create(
 			self.CanvasGroup,
 			TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
@@ -240,7 +245,6 @@ function Library:CreateHeader()
 			dragging = true
 			dragStart = input.Position
 			startPos = self.CanvasGroup.Position
-
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
 					dragging = false
@@ -334,9 +338,7 @@ function Library:SetupEvents()
 		trackNames(tabOpenerButton)
 
 		tabOpenerButton.MouseButton1Click:Connect(function()
-			pcall(function()
-				self:ToggleTabs()
-			end)
+			pcall(function() self:ToggleTabs() end)
 		end)
 
 		local closeButton = Instance.new("TextButton")
@@ -347,10 +349,9 @@ function Library:SetupEvents()
 		trackNames(closeButton)
 
 		closeButton.MouseButton1Click:Connect(function()
-			pcall(function()
-				self:ToggleTabs()
-			end)
+			pcall(function() self:ToggleTabs() end)
 		end)
+
 		self.Visible = true
 
 		UserInputService.InputBegan:Connect(function(input, gameProcessed)
@@ -364,21 +365,12 @@ end
 
 function Library:ToggleTabs()
 	self.IsOpen = not self.IsOpen
-
 	if self.IsOpen then
 		self.TabFrame.Visible = true
 		self.TabFrame.GroupTransparency = 1
-		TweenService:Create(
-			self.TabFrame,
-			TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-			{ GroupTransparency = 0 }
-		):Play()
+		TweenService:Create(self.TabFrame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0}):Play()
 	else
-		TweenService:Create(
-			self.TabFrame,
-			TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-			{ GroupTransparency = 1 }
-		):Play()
+		TweenService:Create(self.TabFrame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 1}):Play()
 		task.delay(0.1, function()
 			if not self.IsOpen then
 				self.TabFrame.Visible = false
@@ -390,16 +382,10 @@ end
 function Library:ToggleVisibility()
 	self.Visible = not self.Visible
 	local target = self.Visible and 0 or 1
-
-	TweenService:Create(
-		self.CanvasGroup,
-		TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{ GroupTransparency = target }
-	):Play()
+	TweenService:Create(self.CanvasGroup, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = target}):Play()
 	if self.Visible then
 		self.CanvasGroup.Interactable = true
 	else
-
 		task.delay(0.1, function()
 			if not self.Visible then
 				self.CanvasGroup.Interactable = false
@@ -410,7 +396,6 @@ end
 
 function Library:AddTab(options)
 	local name, iconId
-
 	if type(options) == "string" then
 		name = options
 		iconId = ""
@@ -421,9 +406,6 @@ function Library:AddTab(options)
 		name = "Tab"
 		iconId = ""
 	end
-
-	name = tostring(name)
-	iconId = tostring(iconId)
 
 	local tab = {}
 	tab.Name = name
@@ -459,8 +441,7 @@ function Library:AddTab(options)
 	containerPadding.Parent = tab.Container
 	trackNames(containerPadding)
 
-	local tabButton = self:CreateTabButton(name, iconId, tab)
-
+	self:CreateTabButton(name, iconId, tab)
 	table.insert(self.Tabs, tab)
 
 	if #self.Tabs == 1 then
@@ -468,21 +449,12 @@ function Library:AddTab(options)
 	end
 
 	return {
-		AddParagraph = function(_, options)
-			return self:AddParagraph(tab, options)
-		end,
-		AddTitle = function(_, options)
-			return self:AddTitle(tab, options)
-		end,
-		AddToggle = function(_, options)
-			return self:AddToggle(tab, options)
-		end,
-		AddButton = function(_, options)
-			return self:AddButton(tab, options)
-		end,
-		AddSlider = function(_, options)
-			return self:AddSlider(tab, options)
-		end,
+		AddParagraph  = function(_, opts) return self:AddParagraph(tab, opts) end,
+		AddTitle      = function(_, opts) return self:AddTitle(tab, opts) end,
+		AddToggle     = function(_, opts) return self:AddToggle(tab, opts) end,
+		AddButton     = function(_, opts) return self:AddButton(tab, opts) end,
+		AddSlider     = function(_, opts) return self:AddSlider(tab, opts) end,
+		AddColorPicker = function(_, opts) return self:AddColorPicker(tab, opts) end,
 	}
 end
 
@@ -527,7 +499,6 @@ function Library:CreateTabButton(name, iconId, tab)
 	local label = Instance.new("TextLabel")
 	label.BackgroundTransparency = 1
 	label.BorderSizePixel = 0
-
 	label.Position = hasIcon and UDim2.new(0.061, 22, 0.174, 0) or UDim2.new(0.061, 0, 0.174, 0)
 	label.Size = UDim2.new(0, hasIcon and 114 or 136, 0, 20)
 	label.Font = Enum.Font.Ubuntu
@@ -551,8 +522,6 @@ function Library:CreateTabButton(name, iconId, tab)
 
 	tab.Button = button
 	tab.Stroke = stroke
-
-	return button
 end
 
 function Library:SelectTab(tab)
@@ -561,21 +530,15 @@ function Library:SelectTab(tab)
 			t.Container.Visible = false
 			t.Button.BackgroundTransparency = 1
 			t.Stroke.Transparency = 1
-			if t.Icon then
-				t.Icon.ImageColor3 = CONFIG.Colors.TextSecondary
-			end
+			if t.Icon then t.Icon.ImageColor3 = CONFIG.Colors.TextSecondary end
 		end
 	end
-
 	if tab.Container and tab.Button and tab.Stroke then
 		tab.Container.Visible = true
 		tab.Button.BackgroundTransparency = 0
 		tab.Stroke.Transparency = 0
-		if tab.Icon then
-			tab.Icon.ImageColor3 = CONFIG.Colors.TextPrimary
-		end
+		if tab.Icon then tab.Icon.ImageColor3 = CONFIG.Colors.TextPrimary end
 	end
-
 	self.CurrentTab = tab
 end
 
@@ -621,14 +584,6 @@ function Library:AddParagraph(tab, options)
 	descLabel.Parent = paragraph
 	trackNames(descLabel)
 
-	local bottomBorder = Instance.new("Frame")
-	bottomBorder.BackgroundColor3 = CONFIG.Colors.Border
-	bottomBorder.BorderSizePixel = 0
-	bottomBorder.Position = UDim2.new(0, 0, 1, 0)
-	bottomBorder.Size = UDim2.new(1, 0, 0, 1)
-	bottomBorder.Parent = paragraph
-	trackNames(bottomBorder)
-
 	local cornerFiller = Instance.new("Frame")
 	cornerFiller.Name = "CornerFiller"
 	cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
@@ -648,17 +603,12 @@ function Library:AddParagraph(tab, options)
 	trackNames(button)
 
 	button.MouseEnter:Connect(function()
-		pcall(function()
-			paragraph.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-			cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-		end)
+		paragraph.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+		cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
 	end)
-
 	button.MouseLeave:Connect(function()
-		pcall(function()
-			paragraph.BackgroundColor3 = CONFIG.Colors.Element
-			cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
-		end)
+		paragraph.BackgroundColor3 = CONFIG.Colors.Element
+		cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
 	end)
 
 	table.insert(tab.Elements, paragraph)
@@ -712,17 +662,12 @@ function Library:AddTitle(tab, options)
 	trackNames(button)
 
 	button.MouseEnter:Connect(function()
-		pcall(function()
-			titleFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-			cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-		end)
+		titleFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+		cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
 	end)
-
 	button.MouseLeave:Connect(function()
-		pcall(function()
-			titleFrame.BackgroundColor3 = CONFIG.Colors.Element
-			cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
-		end)
+		titleFrame.BackgroundColor3 = CONFIG.Colors.Element
+		cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
 	end)
 
 	table.insert(tab.Elements, titleFrame)
@@ -730,10 +675,10 @@ function Library:AddTitle(tab, options)
 end
 
 function Library:AddToggle(tab, options)
-	local title = options.Title or "Toggle"
+	local title       = options.Title       or "Toggle"
 	local description = options.Description or "Description"
-	local default = options.Default or false
-	local callback = options.Callback
+	local default     = options.Default     or false
+	local callback    = options.Callback
 
 	local toggleFrame = Instance.new("Frame")
 	toggleFrame.Name = "Toggle"
@@ -799,23 +744,11 @@ function Library:AddToggle(tab, options)
 
 	clickButton.MouseButton1Click:Connect(function()
 		checkboxState = not checkboxState
-
 		TweenService:Create(checkboxBg, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			BackgroundColor3 = checkboxState and Color3.fromRGB(240, 240, 240) or Color3.fromRGB(25, 25, 25)
 		}):Play()
-
-		if callback then
-			callback(checkboxState)
-		end
+		if callback then callback(checkboxState) end
 	end)
-
-	local bottomBorder = Instance.new("Frame")
-	bottomBorder.BackgroundColor3 = CONFIG.Colors.Border
-	bottomBorder.BorderSizePixel = 0
-	bottomBorder.Position = UDim2.new(0, 0, 1, 0)
-	bottomBorder.Size = UDim2.new(1, 0, 0, 1)
-	bottomBorder.Parent = toggleFrame
-	trackNames(bottomBorder)
 
 	local cornerFiller = Instance.new("Frame")
 	cornerFiller.Name = "CornerFiller"
@@ -837,17 +770,12 @@ function Library:AddToggle(tab, options)
 	trackNames(hoverDetector)
 
 	hoverDetector.MouseEnter:Connect(function()
-		pcall(function()
-			toggleFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-			cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-		end)
+		toggleFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+		cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
 	end)
-
 	hoverDetector.MouseLeave:Connect(function()
-		pcall(function()
-			toggleFrame.BackgroundColor3 = CONFIG.Colors.Element
-			cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
-		end)
+		toggleFrame.BackgroundColor3 = CONFIG.Colors.Element
+		cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
 	end)
 
 	table.insert(tab.Elements, toggleFrame)
@@ -855,9 +783,9 @@ function Library:AddToggle(tab, options)
 end
 
 function Library:AddButton(tab, options)
-	local title = options.Title or "Button"
+	local title       = options.Title       or "Button"
 	local description = options.Description or "Description"
-	local callback = options.Callback
+	local callback    = options.Callback
 
 	local buttonFrame = Instance.new("Frame")
 	buttonFrame.Name = "Button"
@@ -917,18 +845,8 @@ function Library:AddButton(tab, options)
 	trackNames(clickButton)
 
 	clickButton.MouseButton1Click:Connect(function()
-		if callback then
-			callback()
-		end
+		if callback then callback() end
 	end)
-
-	local bottomBorder = Instance.new("Frame")
-	bottomBorder.BackgroundColor3 = CONFIG.Colors.Border
-	bottomBorder.BorderSizePixel = 0
-	bottomBorder.Position = UDim2.new(0, 0, 1, 0)
-	bottomBorder.Size = UDim2.new(1, 0, 0, 1)
-	bottomBorder.Parent = buttonFrame
-	trackNames(bottomBorder)
 
 	local cornerFiller = Instance.new("Frame")
 	cornerFiller.Name = "CornerFiller"
@@ -940,17 +858,12 @@ function Library:AddButton(tab, options)
 	trackNames(cornerFiller)
 
 	clickButton.MouseEnter:Connect(function()
-		pcall(function()
-			buttonFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-			cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-		end)
+		buttonFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+		cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
 	end)
-
 	clickButton.MouseLeave:Connect(function()
-		pcall(function()
-			buttonFrame.BackgroundColor3 = CONFIG.Colors.Element
-			cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
-		end)
+		buttonFrame.BackgroundColor3 = CONFIG.Colors.Element
+		cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
 	end)
 
 	table.insert(tab.Elements, buttonFrame)
@@ -958,20 +871,20 @@ function Library:AddButton(tab, options)
 end
 
 function Library:AddSlider(tab, options)
-	local title = options.Title or "Slider"
+	local title       = options.Title       or "Slider"
 	local description = options.Description or ""
-	local min = options.Min or 0
-	local max = options.Max or 100
-	local default = options.Default or min
-	local increment = options.Increment or 1
-	local suffix = options.Suffix or ""
-	local callback = options.Callback
+	local min         = options.Min         or 0
+	local max         = options.Max         or 100
+	local default     = options.Default     or min
+	local increment   = options.Increment   or 1
+	local suffix      = options.Suffix      or ""
+	local callback    = options.Callback
 
 	local hasDescription = description ~= ""
-	local frameHeight = hasDescription and CONFIG.Sizes.ParagraphHeight or 38
+	local frameHeight    = hasDescription and CONFIG.Sizes.ParagraphHeight or 38
 
 	local sliderFrame = Instance.new("Frame")
-	sliderFrame.Name = hasDescription and "SliderDesc" or "Slider"
+	sliderFrame.Name = "Slider"
 	sliderFrame.BackgroundColor3 = CONFIG.Colors.Element
 	sliderFrame.BorderSizePixel = 0
 	sliderFrame.Size = UDim2.new(0, 570, 0, frameHeight)
@@ -1067,30 +980,20 @@ function Library:AddSlider(tab, options)
 	knobCorner.Parent = sliderKnob
 	trackNames(knobCorner)
 
-	local currentValue = default
 	local dragging = false
 
 	local function updateSlider(input)
 		local pos = math.clamp((input.Position.X - sliderTrack.AbsolutePosition.X) / sliderTrack.AbsoluteSize.X, 0, 1)
 		local value = math.floor((min + (max - min) * pos) / increment + 0.5) * increment
 		value = math.clamp(value, min, max)
-
-		currentValue = value
 		valueLabel.Text = tostring(value) .. suffix
-
 		TweenService:Create(sliderFill, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Size = UDim2.new(pos, 0, 1, 0)
 		}):Play()
-
 		TweenService:Create(sliderKnob, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 			Position = UDim2.new(pos, 0, 0.5, 0)
 		}):Play()
-
-		pcall(function()
-			if callback then
-				callback(value)
-			end
-		end)
+		if callback then pcall(callback, value) end
 	end
 
 	sliderTrack.InputBegan:Connect(function(input)
@@ -1099,26 +1002,16 @@ function Library:AddSlider(tab, options)
 			updateSlider(input)
 		end
 	end)
-
 	sliderTrack.InputEnded:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			dragging = false
 		end
 	end)
-
 	UserInputService.InputChanged:Connect(function(input)
 		if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
 			updateSlider(input)
 		end
 	end)
-
-	local bottomBorder = Instance.new("Frame")
-	bottomBorder.BackgroundColor3 = CONFIG.Colors.Border
-	bottomBorder.BorderSizePixel = 0
-	bottomBorder.Position = UDim2.new(0, 0, 1, 0)
-	bottomBorder.Size = UDim2.new(1, 0, 0, 1)
-	bottomBorder.Parent = sliderFrame
-	trackNames(bottomBorder)
 
 	local cornerFiller = Instance.new("Frame")
 	cornerFiller.Name = "CornerFiller"
@@ -1140,44 +1033,489 @@ function Library:AddSlider(tab, options)
 	trackNames(hoverDetector)
 
 	hoverDetector.MouseEnter:Connect(function()
-		pcall(function()
-			sliderFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-			cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-		end)
+		sliderFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+		cornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
 	end)
-
 	hoverDetector.MouseLeave:Connect(function()
-		pcall(function()
-			sliderFrame.BackgroundColor3 = CONFIG.Colors.Element
-			cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
-		end)
+		sliderFrame.BackgroundColor3 = CONFIG.Colors.Element
+		cornerFiller.BackgroundColor3 = CONFIG.Colors.Element
 	end)
 
 	table.insert(tab.Elements, sliderFrame)
 	return sliderFrame
 end
+
+local function hsvToRgb(h, s, v)
+	if s == 0 then
+		return Color3.new(v, v, v)
+	end
+	local i = math.floor(h * 6)
+	local f = h * 6 - i
+	local p = v * (1 - s)
+	local q = v * (1 - f * s)
+	local t = v * (1 - (1 - f) * s)
+	i = i % 6
+	if i == 0 then return Color3.new(v, t, p)
+	elseif i == 1 then return Color3.new(q, v, p)
+	elseif i == 2 then return Color3.new(p, v, t)
+	elseif i == 3 then return Color3.new(p, q, v)
+	elseif i == 4 then return Color3.new(t, p, v)
+	else return Color3.new(v, p, q)
+	end
+end
+
+local function rgbToHsv(color)
+	local r, g, b = color.R, color.G, color.B
+	local max = math.max(r, g, b)
+	local min = math.min(r, g, b)
+	local delta = max - min
+	local h, s, v = 0, 0, max
+	if max ~= 0 then s = delta / max end
+	if delta ~= 0 then
+		if max == r then
+			h = (g - b) / delta % 6
+		elseif max == g then
+			h = (b - r) / delta + 2
+		else
+			h = (r - g) / delta + 4
+		end
+		h = h / 6
+	end
+	return h, s, v
+end
+
+function Library:AddColorPicker(tab, options)
+	local title    = options.Title   or "Color"
+	local default  = options.Default or Color3.fromRGB(255, 100, 100)
+	local callback = options.Callback
+
+	local currentColor       = default
+	local hue, sat, val      = rgbToHsv(default)
+	local isOpen             = false
+	local svDragging         = false
+	local hueDragging        = false
+
+	local rowFrame = Instance.new("Frame")
+	rowFrame.Name = "ColorPicker"
+	rowFrame.BackgroundColor3 = CONFIG.Colors.Element
+	rowFrame.BorderSizePixel = 0
+	rowFrame.Size = UDim2.new(0, 570, 0, CONFIG.Sizes.ParagraphHeight)
+	rowFrame.Parent = tab.Container
+	trackNames(rowFrame)
+
+	local rowCorner = Instance.new("UICorner")
+	rowCorner.Parent = rowFrame
+	trackNames(rowCorner)
+
+	local rowCornerFiller = Instance.new("Frame")
+	rowCornerFiller.BackgroundColor3 = CONFIG.Colors.Element
+	rowCornerFiller.BorderSizePixel = 0
+	rowCornerFiller.Position = UDim2.new(0, 0, 0.841, 0)
+	rowCornerFiller.Size = UDim2.new(1, 0, 0, 10)
+	rowCornerFiller.Parent = rowFrame
+	trackNames(rowCornerFiller)
+
+	local rowTitle = Instance.new("TextLabel")
+	rowTitle.BackgroundTransparency = 1
+	rowTitle.BorderSizePixel = 0
+	rowTitle.Position = UDim2.new(0.029, 0, 0.174, 0)
+	rowTitle.Size = UDim2.new(0, 350, 0, 20)
+	rowTitle.Font = Enum.Font.Ubuntu
+	rowTitle.Text = title
+	rowTitle.TextColor3 = CONFIG.Colors.TextPrimary
+	rowTitle.TextSize = 14
+	rowTitle.TextXAlignment = Enum.TextXAlignment.Left
+	rowTitle.Parent = rowFrame
+	trackNames(rowTitle)
+
+	local swatch = Instance.new("Frame")
+	swatch.AnchorPoint = Vector2.new(1, 0.5)
+	swatch.Position = UDim2.new(1, -16, 0.5, 0)
+	swatch.Size = UDim2.new(0, 28, 0, 20)
+	swatch.BackgroundColor3 = default
+	swatch.BorderSizePixel = 0
+	swatch.Parent = rowFrame
+	trackNames(swatch)
+
+	local swatchCorner = Instance.new("UICorner")
+	swatchCorner.CornerRadius = UDim.new(0, 4)
+	swatchCorner.Parent = swatch
+	trackNames(swatchCorner)
+
+	local swatchStroke = Instance.new("UIStroke")
+	swatchStroke.Color = CONFIG.Colors.Border
+	swatchStroke.Thickness = 1
+	swatchStroke.Parent = swatch
+	trackNames(swatchStroke)
+
+	local POP_W   = 230
+	local HDR_H   = 34
+	local SV_W    = 210
+	local SV_H    = 140
+	local BAR_H   = 10
+	local PAD     = 10
+	local POP_H   = HDR_H + PAD + SV_H + PAD + BAR_H + PAD
+
+	local overlay = Instance.new("Frame")
+	overlay.BackgroundColor3 = CONFIG.Colors.Background
+	overlay.BackgroundTransparency = 1
+	overlay.BorderSizePixel = 0
+	overlay.Size = UDim2.new(1, 0, 1, 0)
+	overlay.ZIndex = 48
+	overlay.Visible = false
+	overlay.Parent = self.MainFrame
+	trackNames(overlay)
+
+	local overlayCorner = Instance.new("UICorner")
+	overlayCorner.Parent = overlay
+	trackNames(overlayCorner)
+
+	local overlayBtn = Instance.new("TextButton")
+	overlayBtn.Size = UDim2.new(1, 0, 1, 0)
+	overlayBtn.BackgroundTransparency = 1
+	overlayBtn.Text = ""
+	overlayBtn.ZIndex = 49
+	overlayBtn.AutoButtonColor = false
+	overlayBtn.Parent = overlay
+	trackNames(overlayBtn)
+
+	local popup = Instance.new("Frame")
+	popup.BackgroundColor3 = CONFIG.Colors.Element
+	popup.BorderSizePixel = 0
+	popup.AnchorPoint = Vector2.new(0.5, 0.5)
+	popup.Position = UDim2.new(0.5, 0, 0.5, 0)
+	popup.Size = UDim2.new(0, POP_W, 0, POP_H)
+	popup.ZIndex = 50
+	popup.Visible = false
+	popup.ClipsDescendants = true
+	popup.Parent = self.MainFrame
+	trackNames(popup)
+
+	local popupCorner = Instance.new("UICorner")
+	popupCorner.CornerRadius = UDim.new(0, 8)
+	popupCorner.Parent = popup
+	trackNames(popupCorner)
+
+	local popupStroke = Instance.new("UIStroke")
+	popupStroke.Color = CONFIG.Colors.Border
+	popupStroke.Thickness = 1
+	popupStroke.Transparency = 0.4
+	popupStroke.Parent = popup
+	trackNames(popupStroke)
+
+	local popHeader = Instance.new("Frame")
+	popHeader.BackgroundColor3 = CONFIG.Colors.Background
+	popHeader.BorderSizePixel = 0
+	popHeader.Size = UDim2.new(1, 0, 0, HDR_H)
+	popHeader.ZIndex = 51
+	popHeader.Parent = popup
+	trackNames(popHeader)
+
+	local popHeaderCorner = Instance.new("UICorner")
+	popHeaderCorner.CornerRadius = UDim.new(0, 8)
+	popHeaderCorner.Parent = popHeader
+	trackNames(popHeaderCorner)
+
+	local popHeaderFill = Instance.new("Frame")
+	popHeaderFill.BackgroundColor3 = CONFIG.Colors.Background
+	popHeaderFill.BorderSizePixel = 0
+	popHeaderFill.Position = UDim2.new(0, 0, 1, -8)
+	popHeaderFill.Size = UDim2.new(1, 0, 0, 8)
+	popHeaderFill.ZIndex = 51
+	popHeaderFill.Parent = popHeader
+	trackNames(popHeaderFill)
+
+	local popHeaderLine = Instance.new("Frame")
+	popHeaderLine.BackgroundColor3 = CONFIG.Colors.Border
+	popHeaderLine.BorderSizePixel = 0
+	popHeaderLine.Position = UDim2.new(0, 0, 1, -1)
+	popHeaderLine.Size = UDim2.new(1, 0, 0, 1)
+	popHeaderLine.ZIndex = 52
+	popHeaderLine.Parent = popHeader
+	trackNames(popHeaderLine)
+
+	local popTitleLbl = Instance.new("TextLabel")
+	popTitleLbl.BackgroundTransparency = 1
+	popTitleLbl.BorderSizePixel = 0
+	popTitleLbl.AnchorPoint = Vector2.new(0, 0.5)
+	popTitleLbl.Position = UDim2.new(0, PAD, 0.5, 0)
+	popTitleLbl.Size = UDim2.new(1, -PAD * 2, 0, 16)
+	popTitleLbl.Font = Enum.Font.Ubuntu
+	popTitleLbl.Text = title
+	popTitleLbl.TextColor3 = CONFIG.Colors.TextPrimary
+	popTitleLbl.TextSize = 13
+	popTitleLbl.TextXAlignment = Enum.TextXAlignment.Left
+	popTitleLbl.ZIndex = 52
+	popTitleLbl.Parent = popHeader
+	trackNames(popTitleLbl)
+
+	-- SV box
+	local svBox = Instance.new("Frame")
+	svBox.BackgroundColor3 = hsvToRgb(hue, 1, 1)
+	svBox.BorderSizePixel = 0
+	svBox.Position = UDim2.new(0, PAD, 0, HDR_H + PAD)
+	svBox.Size = UDim2.new(0, SV_W, 0, SV_H)
+	svBox.ZIndex = 51
+	svBox.ClipsDescendants = true
+	svBox.Parent = popup
+	trackNames(svBox)
+
+	local svCorner = Instance.new("UICorner")
+	svCorner.CornerRadius = UDim.new(0, 4)
+	svCorner.Parent = svBox
+	trackNames(svCorner)
+
+	local svSatLayer = Instance.new("Frame")
+	svSatLayer.BackgroundColor3 = Color3.new(1, 1, 1)
+	svSatLayer.BorderSizePixel = 0
+	svSatLayer.Size = UDim2.new(1, 0, 1, 0)
+	svSatLayer.ZIndex = 52
+	svSatLayer.Parent = svBox
+	trackNames(svSatLayer)
+
+	local satGrad = Instance.new("UIGradient")
+	satGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	satGrad.Rotation = 0
+	satGrad.Parent = svSatLayer
+	trackNames(satGrad)
+
+	local svValLayer = Instance.new("Frame")
+	svValLayer.BackgroundColor3 = Color3.new(0, 0, 0)
+	svValLayer.BorderSizePixel = 0
+	svValLayer.Size = UDim2.new(1, 0, 1, 0)
+	svValLayer.ZIndex = 53
+	svValLayer.Parent = svBox
+	trackNames(svValLayer)
+
+	local valGrad = Instance.new("UIGradient")
+	valGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(1, 0),
+	})
+	valGrad.Rotation = 90
+	valGrad.Parent = svValLayer
+	trackNames(valGrad)
+
+	-- SV cursor dot
+	local svCursor = Instance.new("Frame")
+	svCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+	svCursor.Position = UDim2.new(sat, 0, 1 - val, 0)
+	svCursor.Size = UDim2.new(0, 10, 0, 10)
+	svCursor.BackgroundColor3 = Color3.new(1, 1, 1)
+	svCursor.BorderSizePixel = 0
+	svCursor.ZIndex = 55
+	svCursor.Parent = svBox
+	trackNames(svCursor)
+
+	local svCursorCorner = Instance.new("UICorner")
+	svCursorCorner.CornerRadius = UDim.new(1, 0)
+	svCursorCorner.Parent = svCursor
+	trackNames(svCursorCorner)
+
+	local svCursorStroke = Instance.new("UIStroke")
+	svCursorStroke.Color = Color3.new(0, 0, 0)
+	svCursorStroke.Thickness = 1.5
+	svCursorStroke.Parent = svCursor
+	trackNames(svCursorStroke)
+
+	local svInput = Instance.new("TextButton")
+	svInput.Size = UDim2.new(1, 0, 1, 0)
+	svInput.BackgroundTransparency = 1
+	svInput.Text = ""
+	svInput.AutoButtonColor = false
+	svInput.ZIndex = 56
+	svInput.Parent = svBox
+	trackNames(svInput)
+
+	local hueBar = Instance.new("Frame")
+	hueBar.BackgroundColor3 = Color3.new(1, 1, 1)
+	hueBar.BorderSizePixel = 0
+	hueBar.Position = UDim2.new(0, PAD, 0, HDR_H + PAD + SV_H + PAD)
+	hueBar.Size = UDim2.new(0, SV_W, 0, BAR_H)
+	hueBar.ZIndex = 51
+	hueBar.Parent = popup
+	trackNames(hueBar)
+
+	local hueBarCorner = Instance.new("UICorner")
+	hueBarCorner.CornerRadius = UDim.new(1, 0)
+	hueBarCorner.Parent = hueBar
+	trackNames(hueBarCorner)
+
+	local hueGrad = Instance.new("UIGradient")
+	hueGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0/6, Color3.fromRGB(255,   0,   0)),
+		ColorSequenceKeypoint.new(1/6, Color3.fromRGB(255, 255,   0)),
+		ColorSequenceKeypoint.new(2/6, Color3.fromRGB(  0, 255,   0)),
+		ColorSequenceKeypoint.new(3/6, Color3.fromRGB(  0, 255, 255)),
+		ColorSequenceKeypoint.new(4/6, Color3.fromRGB(  0,   0, 255)),
+		ColorSequenceKeypoint.new(5/6, Color3.fromRGB(255,   0, 255)),
+		ColorSequenceKeypoint.new(6/6, Color3.fromRGB(255,   0,   0)),
+	})
+	hueGrad.Parent = hueBar
+	trackNames(hueGrad)
+
+	-- hue knob (thin vertical bar style)
+	local hueKnob = Instance.new("Frame")
+	hueKnob.AnchorPoint = Vector2.new(0.5, 0.5)
+	hueKnob.Position = UDim2.new(hue, 0, 0.5, 0)
+	hueKnob.Size = UDim2.new(0, 4, 0, BAR_H + 4)
+	hueKnob.BackgroundColor3 = Color3.new(1, 1, 1)
+	hueKnob.BorderSizePixel = 0
+	hueKnob.ZIndex = 52
+	hueKnob.Parent = hueBar
+	trackNames(hueKnob)
+
+	local hueKnobCorner = Instance.new("UICorner")
+	hueKnobCorner.CornerRadius = UDim.new(0, 2)
+	hueKnobCorner.Parent = hueKnob
+	trackNames(hueKnobCorner)
+
+	local hueKnobStroke = Instance.new("UIStroke")
+	hueKnobStroke.Color = Color3.fromRGB(30, 30, 30)
+	hueKnobStroke.Thickness = 1
+	hueKnobStroke.Parent = hueKnob
+	trackNames(hueKnobStroke)
+
+	-- invisible click layer over hue bar
+	local hueInput = Instance.new("TextButton")
+	hueInput.Size = UDim2.new(1, 0, 1, 0)
+	hueInput.BackgroundTransparency = 1
+	hueInput.Text = ""
+	hueInput.AutoButtonColor = false
+	hueInput.ZIndex = 53
+	hueInput.Parent = hueBar
+	trackNames(hueInput)
+
+	local function updateColor()
+		currentColor = hsvToRgb(hue, sat, val)
+		swatch.BackgroundColor3 = currentColor
+		svBox.BackgroundColor3 = hsvToRgb(hue, 1, 1)
+		svCursor.Position = UDim2.new(sat, 0, 1 - val, 0)
+		hueKnob.Position = UDim2.new(hue, 0, 0.5, 0)
+		if callback then pcall(callback, currentColor) end
+	end
+
+	updateColor()
+
+	local function updateSV(x, y)
+		sat = math.clamp((x - svBox.AbsolutePosition.X) / svBox.AbsoluteSize.X, 0, 1)
+		val = 1 - math.clamp((y - svBox.AbsolutePosition.Y) / svBox.AbsoluteSize.Y, 0, 1)
+		updateColor()
+	end
+
+	local function updateHue(x)
+		hue = math.clamp((x - hueBar.AbsolutePosition.X) / hueBar.AbsoluteSize.X, 0, 1)
+		updateColor()
+	end
+
+	svInput.InputBegan:Connect(function(inp)
+		if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+			svDragging = true
+			updateSV(inp.Position.X, inp.Position.Y)
+		end
+	end)
+	svInput.InputEnded:Connect(function(inp)
+		if inp.UserInputType == Enum.UserInputType.MouseButton1 then svDragging = false end
+	end)
+
+	hueInput.InputBegan:Connect(function(inp)
+		if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+			hueDragging = true
+			updateHue(inp.Position.X)
+		end
+	end)
+	hueInput.InputEnded:Connect(function(inp)
+		if inp.UserInputType == Enum.UserInputType.MouseButton1 then hueDragging = false end
+	end)
+
+	UserInputService.InputChanged:Connect(function(inp)
+		if inp.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+		if svDragging  then updateSV(inp.Position.X, inp.Position.Y) end
+		if hueDragging then updateHue(inp.Position.X) end
+	end)
+
+	local tweenInfo = TweenInfo.new(0.15, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+
+	local function closePicker()
+		isOpen = false
+		TweenService:Create(overlay, tweenInfo, {BackgroundTransparency = 1}):Play()
+		TweenService:Create(popup,   tweenInfo, {Size = UDim2.new(0, POP_W, 0, 0)}):Play()
+		task.delay(0.15, function()
+			if not isOpen then
+				overlay.Visible = false
+				popup.Visible   = false
+				overlay.BackgroundTransparency = 1
+			end
+		end)
+	end
+
+	local function openPicker()
+		isOpen = true
+		overlay.BackgroundTransparency = 1
+		overlay.Visible = true
+		popup.Size = UDim2.new(0, POP_W, 0, 0)
+		popup.Visible = true
+		TweenService:Create(overlay, tweenInfo, {BackgroundTransparency = 0.35}):Play()
+		TweenService:Create(popup,   tweenInfo, {Size = UDim2.new(0, POP_W, 0, POP_H)}):Play()
+	end
+
+	overlayBtn.MouseButton1Click:Connect(closePicker)
+
+	local rowBtn = Instance.new("TextButton")
+	rowBtn.Size = UDim2.new(1, 0, 1, 0)
+	rowBtn.BackgroundTransparency = 1
+	rowBtn.Text = ""
+	rowBtn.AutoButtonColor = false
+	rowBtn.ZIndex = 5
+	rowBtn.Parent = rowFrame
+	trackNames(rowBtn)
+
+	rowBtn.MouseButton1Click:Connect(function()
+		if isOpen then closePicker() else openPicker() end
+	end)
+	rowBtn.MouseEnter:Connect(function()
+		rowFrame.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+		rowCornerFiller.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+	end)
+	rowBtn.MouseLeave:Connect(function()
+		rowFrame.BackgroundColor3 = CONFIG.Colors.Element
+		rowCornerFiller.BackgroundColor3 = CONFIG.Colors.Element
+	end)
+
+	table.insert(tab.Elements, rowFrame)
+
+	return {
+		SetValue = function(_, color)
+			currentColor = color
+			hue, sat, val = rgbToHsv(color)
+			updateColor()
+		end,
+		GetValue = function()
+			return currentColor
+		end,
+	}
+end
+
+local rowFrame = Instance.new("Frame")
+rowFrame.Name = "ColorPicker"
+rowFrame.BackgroundColor3 = CONFIG.Colors.Element
+
 function Library:SetScale(newScale)
 	newScale = math.clamp(newScale, 0.1, 4)
 	self.Scale = newScale
-
 	local uiScale = self.CanvasGroup and self.CanvasGroup:FindFirstChildOfClass("UIScale")
-	if uiScale then
-		uiScale.Scale = newScale
-	end
-
+	if uiScale then uiScale.Scale = newScale end
 	if self.CanvasGroup then
-		self.CanvasGroup.Size = UDim2.new(
-			0, CONFIG.Sizes.MainFrame.X,
-			0, CONFIG.Sizes.MainFrame.Y
-		)
+		self.CanvasGroup.Size = UDim2.new(0, CONFIG.Sizes.MainFrame.X, 0, CONFIG.Sizes.MainFrame.Y)
 	end
 end
 
 function Library:Destroy()
 	stopNameRandomizer()
-	if self.ScreenGui then
-		self.ScreenGui:Destroy()
-	end
+	if self.ScreenGui then self.ScreenGui:Destroy() end
 end
 
 return Library
