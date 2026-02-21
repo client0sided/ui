@@ -1,63 +1,81 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/client0sided/ui/refs/heads/main/library.luau"))()
 
 local Window = Library.new({
-    Title = "Hattori UI",
-    Subtitle = "v1.0",
-    Position = UDim2.new(0.05, 0, 0.22, 0)
+	Title = "Hattori UI",
+	Subtitle = "v1.0",
+	Scale = 0.9,
+	ToggleKey = Enum.KeyCode.A, -- change to whatever
 })
 
 local AimbotTab = Window:AddTab({
-    Title = "Aimbot"
+	Title = "Aimbot",
 })
 
-AimbotTab:AddToggle({
-    Title = "Enable Aimbot",
-    Description = "Automatically aim at targets",
-    Default = false,
-    Callback = function(enabled)
-        print("Aimbot enabled:", enabled)
-    end
+local Toggle = AimbotTab:AddToggle({
+	Title = "Enable Aimbot",
+	Description = "Turn aimbot on or off",
+	Default = false,
+	Callback = function(state)
+		print("Aimbot is now:", state)
+	end
 })
 
-AimbotTab:AddSlider({
-    Title = "Smoothness",
-    Description = "How smooth the aim movement is",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Increment = 1,
-    Suffix = "%",
-    Callback = function(value)
-        print("Smoothness:", value)
-    end
+local Button = AimbotTab:AddButton({
+	Title = "Reset Settings",
+	Description = "Reset all settings to default",
+	Callback = function()
+		print("Settings reset!")
+	end
 })
 
-AimbotTab:AddSlider({
-    Title = "FOV Size",
-    Description = "Field of view radius for targeting",
-    Min = 50,
-    Max = 500,
-    Default = 150,
-    Increment = 1,
-    Suffix = "px",
-    Callback = function(value)
-        print("FOV size:", value)
-    end
+local Slider = AimbotTab:AddSlider({
+	Title = "Smoothness",
+	Description = "Adjust aim smoothness",
+	Min = 0,
+	Max = 100,
+	Default = 50,
+	Increment = 1,
+	Suffix = "%",
+	Callback = function(value)
+		print("Smoothness:", value)
+	end
 })
 
-AimbotTab:AddToggle({
-    Title = "Target Teammates",
-    Description = "Include teammates as targets",
-    Default = false,
-    Callback = function(enabled)
-        print("Target teammates:", enabled)
-    end
+local Toggle2 = AimbotTab:AddToggle({
+	Title = "Enable Aimbot",
+	Description = "Turn aimbot on or off",
+	Default = false,
+	Callback = function(state)
+		print("Aimbot is now:", state)
+	end
 })
 
-AimbotTab:AddButton({
-    Title = "Reset Settings",
-    Description = "Reset all aimbot settings to default",
-    Callback = function()
-        print("Settings reset")
-    end
+local Button2 = AimbotTab:AddButton({
+	Title = "Reset Settings",
+	Description = "Reset all settings to default",
+	Callback = function()
+		print("Settings reset!")
+	end
 })
+
+local Slider2 = AimbotTab:AddSlider({
+	Title = "Smoothness",
+	Description = "Adjust aim smoothness",
+	Min = 0,
+	Max = 100,
+	Default = 50,
+	Increment = 1,
+	Suffix = "%",
+	Callback = function(value)
+		print("Smoothness:", value)
+	end
+})
+
+local picker = AimbotTab:AddColorPicker({
+	Title = "Team Color",
+	Default = Color3.fromRGB(255, 100, 50),
+	Callback = function(color) print(color) end,
+})
+
+picker:SetValue(Color3.fromRGB(0, 255, 0))
+print(picker:GetValue())
